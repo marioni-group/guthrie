@@ -18,8 +18,7 @@ smok = epismoker(betas, method="SSc")
 pData$epismoker = smok[rownames(pData), "smokingScore"]   
 
 
-# Read mother data (smoking) and baby data (birthweight)
-baby = read.csv("Daniel/Guthrie/2021-06-10-smr11-baby.csv")
+# Read mother data (smoking) 
 mother = read.csv("Daniel/Guthrie/2021-06-10-smr02-mother.csv")
 smokingv2 = read.csv("GS/GS_dataset/PCQ/tobaccov2.csv")
 smokingv5 = read.csv("GS/GS_dataset/PCQ/tobaccov5.csv")
@@ -28,7 +27,6 @@ mother$birthdate = as.Date(paste0("01/", gsub("19..", "", mother$dtb), "/", gsub
 mother$dob = as.Date(paste0("01/", gsub("19..", "", mother$m_dob), "/", gsub("..$", "", mother$m_dob)), format="%d/%m/%Y")
 mother$m_age = as.numeric(mother$birthdate-mother$dob)/365.25
 
-pData$gest_age = baby[match(pData$GS_ID, baby$id), "gestation"]
 pData$mother = mother[match(pData$GS_ID, mother$id), "mother"]
 pData$mother_age = mother[match(pData$mother, mother$mother), "m_age"]
 pData$mother_age2 = agesex[match(pData$mother, agesex$id), "age"]
@@ -38,13 +36,6 @@ pData$mat_eversmoke = smok_full[match(pData$mother, smok_full$ID), "ever_smoke"]
 pData$agestart = smok_full[match(pData$mother, smok_full$ID), "age_started"]
 pData$stopped_years = smok_full[match(pData$mother, smok_full$ID), "stopped_years"]
 
-
-
-# Prepare for methyldetectr
-# methyl_eg = readRDS("DNAm_File_Example.rds?download=1")
-# methyl = read.csv("Truncate_to_these_CpGs.csv?download=1")
-# methyl_in = betas[which(rownames(betas) %in% methyl$CpG),]
-# saveRDS(methyl_in, file="guthrie_methyldetectR_input.rds")
 
 
 # Get median from ordinal variables for v5 smokers
@@ -102,8 +93,6 @@ pData$ever_smoke2[which(pData$agestart < pData$mother_age & pData$age_stopped > 
 
 pData$ever_smoke2 = factor(pData$ever_smoke2, levels=c("Current", "Former", "Never"))
 
-pData$bw = baby[match(pData$GS_ID, baby$id), "birthweight"]
-
 current = pData[which(pData$mat_eversmoke==1),]
 former = pData[which(pData$mat_eversmoke %in% c(2,3)),]
 
@@ -111,13 +100,55 @@ former = pData[which(pData$mat_eversmoke %in% c(2,3)),]
 pData$cg05575921 = betas["cg05575921",]
 
 
+pData$ever_smoke3 = ifelse(pData$ever_smoke2 %in% c("Current", "Former"), 1, 0) # Ever Never variable
+pData$ever_smoke3[which(is.na(pData$ever_smoke2))] = NA
+
+
+# Models
+summary(lm(scale(cg05575921) ~ as.factor(ever_smoke3) + as.factor(sex), data=pData))
+
+# Coefficients:
+#                         Estimate Std. Error t value Pr(>|t|)
+# (Intercept)               0.4415     0.2402   1.838   0.0748 .
+# as.factor(ever_smoke3)1  -0.7184     0.3536  -2.032   0.0500 .
+# as.factor(sex)2          -0.4273     0.3536  -1.209   0.2351
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+# Residual standard error: 1.025 on 34 degrees of freedom
+#   (16 observations deleted due to missingness)
+# Multiple R-squared:  0.147,     Adjusted R-squared:  0.09677
+# F-statistic: 2.929 on 2 and 34 DF,  p-value: 0.06707
+
+
+summary(lm(scale(epismoker) ~ as.factor(ever_smoke3) + as.factor(sex), data=pData))
+
+# Coefficients:
+#                         Estimate Std. Error t value Pr(>|t|)
+# (Intercept)             -0.24103    0.22631  -1.065   0.2944
+# as.factor(ever_smoke3)1  0.77829    0.33311   2.336   0.0255 *
+# as.factor(sex)2          0.01927    0.33311   0.058   0.9542
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+# Residual standard error: 0.966 on 34 degrees of freedom
+#   (16 observations deleted due to missingness)
+# Multiple R-squared:  0.139,     Adjusted R-squared:  0.08839
+# F-statistic: 2.745 on 2 and 34 DF,  p-value: 0.07848
+
+
+
+
+
+# Figure 1 Code
 # pdf("mat_smoking_episcore.pdf")
 p1 = ggplot(data.frame(pData[!is.na(pData$ever_smoke2),]), aes(x=ever_smoke2, y=epismoker)) + 
      geom_boxplot() + 
      geom_point() + 
      xlab("Maternal Smoking Status") + 
      ylab("Epigenetic Smoking Score") + 
-	 ggtitle("A")
+	 ggtitle("a") + 
+      theme_gray(base_size=20)
 # dev.off()
 
 # pdf("mat_smoking_cg05575921.pdf")
@@ -126,11 +157,17 @@ geom_boxplot() +
 geom_point() + 
 xlab("Maternal Smoking Status") + 
 ylab("cg05575921 Methylation") + 
-ggtitle("B")
+ggtitle("b") + 
+ theme_gray(base_size = 20)
 # dev.off()
 
 require(gridExtra)
-grid.arrange(p1, p2, nrow=1)
+grid.arrange(p1, p2, nrow=1)   # Snipped and resaved in inkscape (300dpi)
+
+
+write.csv(pData[,c("cg05575921","epismoker", "ever_smoke2")], file="plot_data.csv", quote=F, row.names=F)
+
+
 
 anno = readRDS("Daniel/EPIC_AnnotationObject_df.rds")
 anno = anno[rownames(betas),]
@@ -170,14 +207,13 @@ par(mfrow=c(2,2))
 snp_stats = data.frame(SNP = rownames(dnam_rsids), Mean_DNAm_AA=NA, Mean_DNAm_AB=NA, Mean_DNAm_BB = NA)
 for(i in 1:nrow(snp_stats)){
 snp_stats[i,"Mean_DNAm_AA"] = paste0(signif(mean(dnam_rsids[i, which(snps[,i]==0)], na.rm=T),3), 
-									" (", signif(sd(dnam_rsids[i, which(snps[,i]==0)], na.rm=T),3), ")")
+                                             " (", signif(sd(dnam_rsids[i, which(snps[,i]==0)], na.rm=T),3), ")")
 snp_stats[i,"Mean_DNAm_AB"] = paste0(signif(mean(dnam_rsids[i, which(snps[,i]==1)], na.rm=T),3), 
-									" (", signif(sd(dnam_rsids[i, which(snps[,i]==1)], na.rm=T),3), ")")
+                                             " (", signif(sd(dnam_rsids[i, which(snps[,i]==1)], na.rm=T),3), ")")
 snp_stats[i,"Mean_DNAm_BB"] = paste0(signif(mean(dnam_rsids[i, which(snps[,i]==2)], na.rm=T),3), 
-									" (", signif(sd(dnam_rsids[i, which(snps[,i]==2)], na.rm=T),3), ")")
+                                             " (", signif(sd(dnam_rsids[i, which(snps[,i]==2)], na.rm=T),3), ")")
 }
 write.csv(snp_stats, file="SNP_probe_dnam_summstats.csv", quote=F, row.names=F)
 master_dat = cbind(adult, guthrie_dat)
 all.equal(colnames(master_dat), rownames(master_desc))
 # [1] TRUE
-
