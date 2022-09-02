@@ -5,12 +5,11 @@ library(ggplot2)
 library(gdata)
 library(XLConnect)
 
-
-pData <- readRDS("Daniel/Guthrie/Descriptions.rds")
+pData <- readRDS("Descriptions.rds")
 pData$sex = pData$Sex
 rownames(pData) = pData$Basename
 # Read normalised methylation data
-betas = readRDS("Daniel/Guthrie/Normalised_Beta_Values_daten2.rds")
+betas = readRDS("Normalised_Beta_Values_daten2.rds")
 agesex = read.csv("GS/GS_dataset/agesex_yobmob.csv")
 
 # epismoker
@@ -217,3 +216,115 @@ write.csv(snp_stats, file="SNP_probe_dnam_summstats.csv", quote=F, row.names=F)
 master_dat = cbind(adult, guthrie_dat)
 all.equal(colnames(master_dat), rownames(master_desc))
 # [1] TRUE
+
+
+#### Print version Information ####
+sessionInfo()
+# R version 4.0.3 (2020-10-10)
+# Platform: x86_64-pc-linux-gnu (64-bit)
+# Running under: openSUSE Leap 15.1
+
+# Matrix products: default
+# BLAS:   /usr/local/lib64/R/lib/libRblas.so
+# LAPACK: /usr/local/lib64/R/lib/libRlapack.so
+
+# locale:
+#  [1] LC_CTYPE=en_GB.UTF-8          LC_NUMERIC=C
+#  [3] LC_TIME=en_GB.UTF-8           LC_COLLATE=en_GB.UTF-8
+#  [5] LC_MONETARY=en_GB.UTF-8       LC_MESSAGES=en_GB.UTF-8
+#  [7] LC_PAPER=en_GB.UTF-8          LC_NAME=en_GB.UTF-8
+#  [9] LC_ADDRESS=en_GB.UTF-8        LC_TELEPHONE=en_GB.UTF-8
+# [11] LC_MEASUREMENT=en_GB.UTF-8    LC_IDENTIFICATION=en_GB.UTF-8
+
+# attached base packages:
+# [1] stats4    parallel  stats     graphics  grDevices utils     datasets
+# [8] methods   base
+
+# other attached packages:
+#  [1] gridExtra_2.3
+#  [2] XLConnect_1.0.1
+#  [3] gdata_2.18.0
+#  [4] ggplot2_3.3.5
+#  [5] dplyr_1.0.7
+#  [6] lumi_2.42.0
+#  [7] EpiSmokEr_0.1.0
+#  [8] rmarkdown_2.5
+#  [9] IlluminaHumanMethylation450kanno.ilmn12.hg19_0.6.0
+# [10] IlluminaHumanMethylation450kmanifest_0.4.0
+# [11] minfi_1.36.0
+# [12] bumphunter_1.32.0
+# [13] locfit_1.5-9.4
+# [14] iterators_1.0.13
+# [15] foreach_1.5.1
+# [16] Biostrings_2.58.0
+# [17] XVector_0.30.0
+# [18] SummarizedExperiment_1.20.0
+# [19] Biobase_2.50.0
+# [20] MatrixGenerics_1.2.0
+# [21] matrixStats_0.57.0
+# [22] GenomicRanges_1.42.0
+# [23] GenomeInfoDb_1.26.0
+# [24] IRanges_2.24.0
+# [25] S4Vectors_0.28.0
+# [26] BiocGenerics_0.36.0
+# [27] htmlTable_2.1.0
+
+# loaded via a namespace (and not attached):
+#   [1] backports_1.1.10          BiocFileCache_1.14.0
+#   [3] plyr_1.8.6                splines_4.0.3
+#   [5] BiocParallel_1.24.0       digest_0.6.27
+#   [7] htmltools_0.5.2           fansi_0.5.0
+#   [9] magrittr_2.0.1            checkmate_2.0.0
+#  [11] memoise_1.1.0             tzdb_0.2.0
+#  [13] limma_3.46.0              readr_2.1.2
+#  [15] annotate_1.68.0           askpass_1.1
+#  [17] siggenes_1.64.0           prettyunits_1.1.1
+#  [19] colorspace_2.0-1          blob_1.2.2
+#  [21] rappdirs_0.3.1            xfun_0.18
+#  [23] crayon_1.4.1              RCurl_1.98-1.2
+#  [25] genefilter_1.72.0         GEOquery_2.58.0
+#  [27] survival_3.2-7            glue_1.6.2
+#  [29] gtable_0.3.0              zlibbioc_1.36.0
+#  [31] DelayedArray_0.16.0       Rhdf5lib_1.12.0
+#  [33] HDF5Array_1.18.0          scales_1.1.1
+#  [35] DBI_1.1.2                 rngtools_1.5
+#  [37] Rcpp_1.0.8                xtable_1.8-4
+#  [39] progress_1.2.2            bit_4.0.4
+#  [41] mclust_5.4.6              preprocessCore_1.52.0
+#  [43] htmlwidgets_1.5.3         httr_1.4.2
+#  [45] RColorBrewer_1.1-2        ellipsis_0.3.2
+#  [47] rJava_0.9-13              pkgconfig_2.0.3
+#  [49] reshape_0.8.8             XML_3.99-0.5
+#  [51] dbplyr_1.4.4              utf8_1.2.1
+#  [53] tidyselect_1.1.1          rlang_1.0.2
+#  [55] AnnotationDbi_1.52.0      munsell_0.5.0
+#  [57] tools_4.0.3               cli_3.2.0
+#  [59] generics_0.1.0            RSQLite_2.2.1
+#  [61] evaluate_0.14             stringr_1.4.0
+#  [63] fastmap_1.1.0             knitr_1.30
+#  [65] bit64_4.0.5               beanplot_1.2
+#  [67] scrime_1.3.5              methylumi_2.36.0
+#  [69] purrr_0.3.4               nlme_3.1-150
+#  [71] doRNG_1.8.2               sparseMatrixStats_1.2.0
+#  [73] nor1mix_1.3-0             xml2_1.3.2
+#  [75] biomaRt_2.46.0            compiler_4.0.3
+#  [77] rstudioapi_0.11           curl_4.3
+#  [79] affyio_1.60.0             tibble_3.1.2
+#  [81] stringi_1.6.2             GenomicFeatures_1.42.0
+#  [83] lattice_0.20-41           Matrix_1.2-18
+#  [85] multtest_2.46.0           vctrs_0.3.8
+#  [87] pillar_1.6.1              lifecycle_1.0.1
+#  [89] rhdf5filters_1.2.0        BiocManager_1.30.10
+#  [91] data.table_1.14.0         bitops_1.0-7
+#  [93] rtracklayer_1.50.0        R6_2.5.0
+#  [95] affy_1.68.0               KernSmooth_2.23-17
+#  [97] nleqslv_3.3.2             codetools_0.2-16
+#  [99] gtools_3.9.2              MASS_7.3-53
+# [101] assertthat_0.2.1          rhdf5_2.34.0
+# [103] openssl_1.4.3             withr_2.4.2
+# [105] GenomicAlignments_1.26.0  Rsamtools_2.6.0
+# [107] GenomeInfoDbData_1.2.4    mgcv_1.8-33
+# [109] hms_1.1.1                 quadprog_1.5-8
+# [111] grid_4.0.3                tidyr_1.1.3
+# [113] base64_2.0                DelayedMatrixStats_1.12.0
+# [115] illuminaio_0.32.0
